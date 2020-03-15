@@ -4,6 +4,7 @@ package org.openapitools.codegen.languages;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.Schema;
+import io.swagger.v3.oas.models.media.ArraySchema;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.openapitools.codegen.*;
@@ -73,54 +74,58 @@ public class DlangClientCodegen extends DefaultCodegen implements CodegenConfig 
         setReservedWordsLowerCase(
                 Arrays.asList(
                         // local variable names used in API methods (endpoints)
+                        // D reserved keywords
+                        // ref: https://digitalmars.com/d/2.0/lex.html
+                   "abstract", "alias", "align", "asm", "assert", "auto",
 
-                        // c reserved keywords
-                        // ref: https://en.cppreference.com/w/c/keyword
-                        "auto",
-                        "break",
-                        "case",
-                        "char",
-                        "const",
-                        "continue",
-                        "default",
-                        "do",
-                        "double",
-                        "else",
-                        "enum",
-                        "extern",
-                        "float",
-                        "for",
-                        "goto",
-                        "if",
-                        "inline",
-                        "int",
-                        "long",
-                        "register",
-                        "remove",
-                        "restrict",
-                        "return",
-                        "short",
-                        "signed",
-                        "sizeof",
-                        "static",
-                        "struct",
-                        "switch",
-                        "typedef",
-                        "union",
-                        "unsigned",
-                        "void",
-                        "volatile",
-                        "while",
-                        "_Alignas",
-                        "_Alignof",
-                        "_Atomic",
-                        "_Bool",
-                        "_Complex",
-                        "_Generic",
-                        "_Imaginary",
-                        "_Noreturn",
-                        "_Static_assert",
-                        "_Thread_local")
+                   // Body is deprecated
+                   /*"body",*/ "bool", "break", "byte",
+
+                   "case", "cast", "catch", "cdouble", "cent", "cfloat",
+                   "char", "class", "const", "continue", "creal",
+
+                   "dchar", "debug", "default", "delegate", "delete",
+                   "deprecated", "do", "double",
+
+                   "else", "enum", "export", "extern",
+
+                   "false", "final", "finally", "float", "for", "foreach",
+                   "foreach_reverse", "function",
+
+                   "goto",
+
+                   "idouble", "if", "ifloat", "immutable", "import", "in",
+                   "inout", "int", "interface", "invariant", "ireal", "is",
+
+                   "lazy", "long",
+
+                   "macro", "mixin", "module",
+
+                   "new", "nothrow", "null",
+
+                   "out", "override",
+
+                   "package", "pragma", "private", "protected", "public",
+                   "pure",
+
+                   "real", "ref", "return",
+
+                   "scope", "shared", "short", "static", "struct", "super",
+                   "switch", "synchronized",
+
+                   "template", "this", "throw", "true", "try", "typedef",
+                   "typeid", "typeof",
+
+                   "ubyte", "ucent", "uint", "ulong", "union", "unittest",
+                   "ushort",
+
+                   "version", "void", "volatile",
+
+                   "wchar", "while", "with",
+
+                   "__FILE__", "__LINE__", "__gshared", "__traits", "__vector",
+                   "__parameters"
+                   )
         );
 
         instantiationTypes.clear();
@@ -128,47 +133,40 @@ public class DlangClientCodegen extends DefaultCodegen implements CodegenConfig 
         importMapping.clear();
         languageSpecificPrimitives.clear();
 
-        // primitives in C lang
+        // primitives in D lang
         languageSpecificPrimitives.add("int");
+        languageSpecificPrimitives.add("uint");
         languageSpecificPrimitives.add("short");
-        languageSpecificPrimitives.add("int");
+        languageSpecificPrimitives.add("ushort");
         languageSpecificPrimitives.add("long");
+        languageSpecificPrimitives.add("ulong");
         languageSpecificPrimitives.add("float");
         languageSpecificPrimitives.add("double");
+        languageSpecificPrimitives.add("bool");
         languageSpecificPrimitives.add("char");
-        languageSpecificPrimitives.add("binary_t*");
+        languageSpecificPrimitives.add("string");
+        languageSpecificPrimitives.add("array");
+        languageSpecificPrimitives.add("map");
         languageSpecificPrimitives.add("Object");
-        languageSpecificPrimitives.add("list_t*");
-        languageSpecificPrimitives.add("list");
 
-        typeMapping.put("string", "char");
+        typeMapping.put("string", "string");
         typeMapping.put("char", "char");
         typeMapping.put("integer", "int");
         typeMapping.put("long", "long");
-        typeMapping.put("float", "double");
-        typeMapping.put("double", "float");
+        typeMapping.put("float", "float");
+        typeMapping.put("double", "double");
         typeMapping.put("number", "float");
-        typeMapping.put("date", "char");
-        typeMapping.put("DateTime", "char");
-        typeMapping.put("boolean", "int");
-        typeMapping.put("file", "binary_t*");
-        typeMapping.put("binary", "binary_t*");
-        typeMapping.put("ByteArray", "char");
-        typeMapping.put("UUID", "char");
-        typeMapping.put("URI", "char");
-        typeMapping.put("array", "list");
-        typeMapping.put("map", "list_t*");
-        typeMapping.put("date-time", "char");
-
-        // remove modelPackage and apiPackage added by default
-        Iterator<CliOption> itr = cliOptions.iterator();
-        while (itr.hasNext()) {
-            CliOption opt = itr.next();
-            if (CodegenConstants.MODEL_PACKAGE.equals(opt.getOpt()) ||
-                    CodegenConstants.API_PACKAGE.equals(opt.getOpt())) {
-                itr.remove();
-            }
-        }
+        typeMapping.put("date", "string");
+        typeMapping.put("DateTime", "string");
+        typeMapping.put("boolean", "bool");
+        typeMapping.put("file", "ubyte[]");
+        typeMapping.put("binary", "ubyte[]");
+        typeMapping.put("ByteArray", "ubyte[]");
+        typeMapping.put("UUID", "string");
+        typeMapping.put("URI", "string");
+        //typeMapping.put("array", "[]");
+        //strintypeMapping.put("map", "[string]");
+        typeMapping.put("date-time", "string");
 
         cliOptions.add(new CliOption(CodegenConstants.HIDE_GENERATION_TIMESTAMP, CodegenConstants.HIDE_GENERATION_TIMESTAMP_DESC).
                 defaultValue(Boolean.TRUE.toString()));
@@ -204,15 +202,13 @@ public class DlangClientCodegen extends DefaultCodegen implements CodegenConfig 
 
     @Override
     public String getTypeDeclaration(Schema schema) {
-        /* comment out below as we'll do it in the template instead
         if (ModelUtils.isArraySchema(schema)) {
             Schema inner = ((ArraySchema) schema).getItems();
-            return getSchemaType(schema) + "<" + getTypeDeclaration(inner) + ">";
+            return getTypeDeclaration(inner) + "[]";
         } else if (ModelUtils.isMapSchema(schema)) {
             Schema inner = (Schema) schema.getAdditionalProperties();
-            return getSchemaType(schema) + "<String, " + getTypeDeclaration(inner) + ">";
+            return getTypeDeclaration(inner) + "[string]";
         }
-        */
 
         return super.getTypeDeclaration(schema);
     }

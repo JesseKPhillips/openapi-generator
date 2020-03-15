@@ -1,469 +1,546 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <ctype.h>
-#include "{{classname}}.h"
+import etc.c.curl;
+import core.stdc.stdlib;
+import core.stdc.string;
+import core.stdc.stdio;
+import core.stdc.stdint;
 
+import std.string;
 
-#define MAX_BUFFER_LENGTH 4096
-#define intToStr(dst, src) \
-    do {\
-    char dst[256];\
-    snprintf(dst, 256, "%ld", (long int)(src));\
-}while(0)
-
-{{#operations}}
-{{#operation}}
-{{#summary}}
-// {{{summary}}}
-//
-{{/summary}}
-{{#notes}}
-// {{{notes}}}
-//
-{{/notes}}
-{{#returnType}}{{#returnTypeIsPrimitive}}{{#returnSimpleType}}{{{.}}}*{{/returnSimpleType}}{{^returnSimpleType}}{{#isListContainer}}{{{.}}}_t*{{/isListContainer}}{{#isMapContainer}}{{{.}}}{{/isMapContainer}}{{/returnSimpleType}}{{/returnTypeIsPrimitive}}{{^returnTypeIsPrimitive}}{{{.}}}_t*{{/returnTypeIsPrimitive}}{{/returnType}}{{^returnType}}void{{/returnType}}
-{{{classname}}}_{{{operationId}}}(apiClient_t *apiClient{{#allParams}} ,{{#isPrimitiveType}}{{#isNumber}}{{{dataType}}}{{/isNumber}}{{#isLong}}{{{dataType}}}{{/isLong}}{{#isInteger}}{{{dataType}}}{{/isInteger}}{{#isDouble}}{{{dataType}}}{{/isDouble}}{{#isFloat}}{{{dataType}}}{{/isFloat}}{{#isBoolean}}{{dataType}}{{/isBoolean}}{{#isEnum}}{{#isString}}{{{baseName}}}_e{{/isString}}{{/isEnum}}{{^isEnum}}{{#isString}}{{{dataType}}} *{{/isString}}{{/isEnum}}{{#isByteArray}}{{{dataType}}}{{/isByteArray}}{{#isDate}}{{{dataType}}}{{/isDate}}{{#isDateTime}}{{{dataType}}}{{/isDateTime}}{{#isFile}}{{{dataType}}}{{/isFile}}{{#isFreeFormObject}}{{dataType}}_t *{{/isFreeFormObject}}{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isModel}}{{#isEnum}}{{datatypeWithEnum}}_e{{/isEnum}}{{^isEnum}}{{{dataType}}}_t *{{/isEnum}}{{/isModel}}{{^isModel}}{{^isListContainer}}{{#isEnum}}{{datatypeWithEnum}}_e{{/isEnum}}{{/isListContainer}}{{/isModel}}{{#isUuid}}{{dataType}} *{{/isUuid}}{{#isEmail}}{{dataType}}{{/isEmail}}{{/isPrimitiveType}}{{#isContainer}}{{#isListContainer}}{{dataType}}_t *{{/isListContainer}}{{#isMapContainer}}{{dataType}}{{/isMapContainer}}{{/isContainer}} {{{paramName}}}{{/allParams}})
-{
-    list_t    *localVarQueryParameters = {{#hasQueryParams}}list_create();{{/hasQueryParams}}{{^hasQueryParams}}NULL;{{/hasQueryParams}}
-    list_t    *localVarHeaderParameters = {{#hasHeaderParams}}list_create();{{/hasHeaderParams}}{{^hasHeaderParams}}NULL;{{/hasHeaderParams}}
-    list_t    *localVarFormParameters = {{#hasFormParams}}list_create();{{/hasFormParams}}{{^hasFormParams}}NULL;{{/hasFormParams}}
-    list_t *localVarHeaderType = {{#hasProduces}}list_create();{{/hasProduces}}{{^hasProduces}}NULL;{{/hasProduces}}
-    list_t *localVarContentType = {{#hasConsumes}}list_create();{{/hasConsumes}}{{^hasConsumes}}NULL;{{/hasConsumes}}
-    char      *localVarBodyParameters = NULL;
-
-    // create the path
-    long sizeOfPath = strlen("{{{path}}}")+1;
-    char *localVarPath = malloc(sizeOfPath);
-    snprintf(localVarPath, sizeOfPath, "{{{path}}}");
-
-    {{#pathParams}}
-
-    // Path Params
-    long sizeOfPathParams_{{{paramName}}} = {{#pathParams}}{{#isLong}}sizeof({{paramName}})+3{{/isLong}}{{#isString}}strlen({{paramName}})+3{{/isString}}{{#hasMore}} + {{/hasMore}}{{/pathParams}} + strlen("{ {{paramName}} }");
-    {{#isNumeric}}
-    if({{paramName}} == 0){
-        goto end;
-    }
-    char* localVarToReplace_{{paramName}} = malloc(sizeOfPathParams_{{paramName}});
-    snprintf(localVarToReplace_{{paramName}}, sizeOfPathParams_{{paramName}}, "{%s}", "{{paramName}}");
-
-    char localVarBuff_{{paramName}}[256];
-    intToStr(localVarBuff_{{paramName}}, {{paramName}});
-
-    localVarPath = strReplace(localVarPath, localVarToReplace_{{paramName}}, localVarBuff_{{paramName}});
-
-    {{/isNumeric}}
-    {{#isInteger}}
-    if({{paramName}} == 0){
-        goto end;
-    }
-    char* localVarToReplace_{{paramName}} = malloc(sizeOfPathParams_{{paramName}});
-    snprintf(localVarToReplace_{{paramName}}, sizeOfPathParams_{{paramName}}, "{%s}", "{{paramName}}");
-
-    char localVarBuff_{{paramName}}[256];
-    intToStr(localVarBuff_{{paramName}}, {{paramName}});
-
-    localVarPath = strReplace(localVarPath, localVarToReplace_{{paramName}}, localVarBuff_{{paramName}});
-
-    {{/isInteger}}
-    {{#isFloat}}
-    if({{paramName}} == 0){
-        goto end;
-    }
-    char* localVarToReplace_{{paramName}} = malloc(sizeOfPathParams_{{paramName}});
-    snprintf(localVarToReplace_{{paramName}}, sizeOfPathParams_{{paramName}}, "{%s}", "{{paramName}}");
-
-    char localVarBuff_{{paramName}}[256];
-    intToStr(localVarBuff_{{paramName}}, {{paramName}});
-
-    localVarPath = strReplace(localVarPath, localVarToReplace_{{paramName}}, localVarBuff_{{paramName}});
-
-    {{/isFloat}}
-    {{#isLong}}
-    if({{paramName}} == 0){
-        goto end;
-    }
-    char* localVarToReplace_{{paramName}} = malloc(sizeOfPathParams_{{paramName}});
-    snprintf(localVarToReplace_{{paramName}}, sizeOfPathParams_{{paramName}}, "{%s}", "{{paramName}}");
-
-    char localVarBuff_{{paramName}}[256];
-    intToStr(localVarBuff_{{paramName}}, {{paramName}});
-
-    localVarPath = strReplace(localVarPath, localVarToReplace_{{paramName}}, localVarBuff_{{paramName}});
-
-    {{/isLong}}
-    {{#isString}}
-    if({{paramName}} == NULL) {
-        goto end;
-    }
-    char* localVarToReplace_{{paramName}} = malloc(sizeOfPathParams_{{paramName}});
-    sprintf(localVarToReplace_{{paramName}}, "{%s}", "{{paramName}}");
-
-    localVarPath = strReplace(localVarPath, localVarToReplace_{{paramName}}, {{paramName}});
-    {{/isString}}
-    {{#isUuid}}
-    if({{paramName}} == NULL) {
-        goto end;
-    }
-    char* localVarToReplace_{{paramName}} = malloc(sizeOfPathParams_{{paramName}});
-    sprintf(localVarToReplace_{{paramName}}, "{%s}", "{{paramName}}");
-
-    localVarPath = strReplace(localVarPath, localVarToReplace_{{paramName}}, {{paramName}});
-    {{/isUuid}}
-    {{/pathParams}}
-
-
-    {{#headerParams}}
-
-    // header parameters
-    char *keyHeader_{{{paramName}}};
-    {{#isPrimitiveType}}{{#isNumber}}{{{dataType}}}{{/isNumber}}{{#isLong}}{{{dataType}}}{{/isLong}}{{#isInteger}}{{{dataType}}}{{/isInteger}}{{#isDouble}}{{{dataType}}}{{/isDouble}}{{#isFloat}}{{{dataType}}}{{/isFloat}}{{#isBoolean}}{{dataType}}{{/isBoolean}}{{#isEnum}}{{#isString}}{{{baseName}}}_e{{/isString}}{{/isEnum}}{{^isEnum}}{{#isString}}{{{dataType}}} *{{/isString}}{{/isEnum}}{{#isByteArray}}{{{dataType}}}{{/isByteArray}}{{#isDate}}{{{dataType}}}{{/isDate}}{{#isDateTime}}{{{dataType}}}{{/isDateTime}}{{#isFile}}{{{dataType}}}{{/isFile}}{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isModel}}{{#isEnum}}{{datatypeWithEnum}}_e{{/isEnum}}{{^isEnum}}{{{dataType}}}_t *{{/isEnum}}{{/isModel}}{{^isModel}}{{#isEnum}}{{datatypeWithEnum}}_e{{/isEnum}}{{/isModel}}{{#isUuid}}{{dataType}} *{{/isUuid}}{{#isEmail}}{{dataType}}{{/isEmail}}{{/isPrimitiveType}} valueHeader_{{{paramName}}};
-    keyValuePair_t *keyPairHeader_{{paramName}} = 0;
-    if ({{paramName}}) {
-        keyHeader_{{{paramName}}} = strdup("{{{baseName}}}");
-        valueHeader_{{{paramName}}} = {{#isString}}{{^isEnum}}strdup({{/isEnum}}{{/isString}}({{{paramName}}}){{#isString}}{{^isEnum}}){{/isEnum}}{{/isString}};
-        keyPairHeader_{{paramName}} = keyValuePair_create(keyHeader_{{{paramName}}}, {{#isEnum}}(void *){{/isEnum}}{{^isString}}&{{/isString}}valueHeader_{{{paramName}}});
-        list_addElement(localVarHeaderParameters,keyPairHeader_{{paramName}});
-    }
-
-    {{/headerParams}}
-    {{#queryParams}}
-
-    // query parameters
-    {{^isListContainer}}
-    char *keyQuery_{{{paramName}}} = NULL;
-    {{#isPrimitiveType}}{{#isNumber}}{{{dataType}}}{{/isNumber}}{{#isLong}}{{{dataType}}}{{/isLong}}{{#isInteger}}{{{dataType}}}{{/isInteger}}{{#isDouble}}{{{dataType}}}{{/isDouble}}{{#isFloat}}{{{dataType}}}{{/isFloat}}{{#isBoolean}}{{{dataType}}}{{/isBoolean}}{{#isEnum}}{{#isString}}{{{baseName}}}_e{{/isString}}{{/isEnum}}{{^isEnum}}{{#isString}}{{{dataType}}} *{{/isString}}{{/isEnum}}{{#isByteArray}}{{{dataType}}}{{/isByteArray}}{{#isDate}}{{{dataType}}}{{/isDate}}{{#isDateTime}}{{{dataType}}}{{/isDateTime}}{{#isFile}}{{{dataType}}}{{/isFile}}{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isModel}}{{#isEnum}}{{datatypeWithEnum}}_e{{/isEnum}}{{^isEnum}}{{{dataType}}}_t *{{/isEnum}}{{/isModel}}{{^isModel}}{{#isEnum}}{{datatypeWithEnum}}_e{{/isEnum}}{{/isModel}}{{#isUuid}}{{dataType}} *{{/isUuid}}{{#isEmail}}{{dataType}}{{/isEmail}}{{/isPrimitiveType}} valueQuery_{{{paramName}}} {{#isString}}{{^isEnum}}= NULL{{/isEnum}}{{/isString}};
-    keyValuePair_t *keyPairQuery_{{paramName}} = 0;
-    {{/isListContainer}}
-    if ({{paramName}})
-    {
-        {{#isListContainer}}
-        list_addElement(localVarQueryParameters,{{paramName}});
-        {{/isListContainer}}
-        {{^isListContainer}}
-        keyQuery_{{{paramName}}} = strdup("{{{baseName}}}");
-        valueQuery_{{{paramName}}} = {{#isString}}{{^isEnum}}strdup({{/isEnum}}{{/isString}}({{{paramName}}}){{#isString}}{{^isEnum}}){{/isEnum}}{{/isString}};
-        keyPairQuery_{{paramName}} = keyValuePair_create(keyQuery_{{{paramName}}}, {{#isEnum}}(void *){{/isEnum}}{{^isString}}&{{/isString}}valueQuery_{{{paramName}}});
-        list_addElement(localVarQueryParameters,keyPairQuery_{{paramName}});
-        {{/isListContainer}}
-    }
-    {{/queryParams}}
-    {{#formParams}}
-
-    // form parameters
-    {{#isFile}}
-    char *keyForm_{{paramName}};
-    {{{dataType}}} valueForm_{{paramName}};
-    keyValuePair_t *keyPairForm_{{paramName}} = 0;
-    {{/isFile}}
-    {{^isFile}}
-    char *keyForm_{{paramName}};
-    {{#isPrimitiveType}}{{#isNumber}}{{{dataType}}}{{/isNumber}}{{#isLong}}{{{dataType}}}{{/isLong}}{{#isInteger}}{{{dataType}}}{{/isInteger}}{{#isDouble}}{{{dataType}}}{{/isDouble}}{{#isFloat}}{{{dataType}}}{{/isFloat}}{{#isBoolean}}{{dataType}}{{/isBoolean}}{{#isEnum}}{{#isString}}{{{baseName}}}_e{{/isString}}{{/isEnum}}{{^isEnum}}{{#isString}}{{{dataType}}} *{{/isString}}{{/isEnum}}{{#isByteArray}}{{{dataType}}}{{/isByteArray}}{{#isDate}}{{{dataType}}}{{/isDate}}{{#isDateTime}}{{{dataType}}}{{/isDateTime}}{{#isFile}}{{{dataType}}}{{/isFile}}{{/isPrimitiveType}}{{^isPrimitiveType}}{{#isModel}}{{#isEnum}}{{datatypeWithEnum}}_e{{/isEnum}}{{^isEnum}}{{{dataType}}}_t *{{/isEnum}}{{/isModel}}{{^isModel}}{{#isEnum}}{{datatypeWithEnum}}_e{{/isEnum}}{{/isModel}}{{#isUuid}}{{dataType}} *{{/isUuid}}{{#isEmail}}{{dataType}}{{/isEmail}}{{/isPrimitiveType}} valueForm_{{paramName}};
-    keyValuePair_t *keyPairForm_{{paramName}} = 0;
-    {{/isFile}}
-    if ({{paramName}} != NULL)
-    {
-        {{#isFile}}
-        keyForm_{{paramName}} = strdup("{{{baseName}}}");
-        valueForm_{{paramName}} = {{paramName}};
-        keyPairForm_{{paramName}} = keyValuePair_create(keyForm_{{paramName}}, &valueForm_{{paramName}});
-        list_addElement(localVarFormParameters,keyPairForm_{{paramName}}); //file adding
-        {{/isFile}}
-        {{^isFile}}
-        keyForm_{{paramName}} = strdup("{{{baseName}}}");
-        valueForm_{{paramName}} = {{#isString}}{{^isEnum}}strdup({{/isEnum}}{{/isString}}({{{paramName}}}){{#isString}}{{^isEnum}}){{/isEnum}}{{/isString}};
-        keyPairForm_{{paramName}} = keyValuePair_create(keyForm_{{paramName}},{{#isString}}{{#isEnum}}(void *){{/isEnum}}{{/isString}}{{^isString}}&{{/isString}}valueForm_{{paramName}});
-        list_addElement(localVarFormParameters,keyPairForm_{{paramName}});
-        {{/isFile}}
-    }
-    {{/formParams}}
-    {{#bodyParam}}
-
-    // Body Param
-    {{#isListContainer}}
-    //notstring
-    cJSON *localVar_{{paramName}};
-    cJSON *localVarItemJSON_{{paramName}};
-    cJSON *localVarSingleItemJSON_{{paramName}};
-    if ({{paramName}} != NULL)
-    {
-        localVarItemJSON_{{paramName}} = cJSON_CreateObject();
-        localVarSingleItemJSON_{{paramName}} = cJSON_AddArrayToObject(localVarItemJSON_{{paramName}}, "{{paramName}}");
-        if (localVarSingleItemJSON_{{paramName}} == NULL)
-        {
-            // nonprimitive container
-
-            goto end;
-        }
-    }
-
-    listEntry_t *{{paramName}}BodyListEntry;
-    list_ForEach({{paramName}}BodyListEntry, {{paramName}})
-    {
-        localVar_{{paramName}} = {{#items}}{{complexType}}{{/items}}_convertToJSON({{paramName}}BodyListEntry->data);
-        if(localVar_{{paramName}} == NULL)
-        {
-            goto end;
-        }
-        cJSON_AddItemToArray(localVarSingleItemJSON_{{paramName}}, localVar_{{paramName}});
-        localVarBodyParameters = cJSON_Print(localVarItemJSON_{{paramName}});
-    }
-    {{/isListContainer}}
-    {{^isListContainer}}
-    cJSON *localVarSingleItemJSON_{{paramName}};
-    if ({{paramName}} != NULL)
-    {
-        //string
-        localVarSingleItemJSON_{{paramName}} = {{dataType}}_convertToJSON({{paramName}});
-        localVarBodyParameters = cJSON_Print(localVarSingleItemJSON_{{paramName}});
-    }
-    {{/isListContainer}}
-    {{/bodyParam}}
-    {{#produces}}
-    list_addElement(localVarHeaderType,"{{{mediaType}}}"); //produces
-    {{/produces}}
-    {{#consumes}}
-    list_addElement(localVarContentType,"{{{mediaType}}}"); //consumes
-    {{/consumes}}
-    apiClient_invoke(apiClient,
-                    localVarPath,
-                    localVarQueryParameters,
-                    localVarHeaderParameters,
-                    localVarFormParameters,
-                    localVarHeaderType,
-                    localVarContentType,
-                    localVarBodyParameters,
-                    "{{{httpMethod}}}");
-
-    {{#responses}}
-    if (apiClient->response_code == {{code}}) {
-        printf("%s\n","{{message}}");
-    }
-    {{/responses}}
-    {{#returnType}}
-    {{#returnTypeIsPrimitive}}
-    {{#returnSimpleType}}
-    //primitive reutrn type simple
-    {{returnType}}* elementToReturn =  strdup(({{returnType}}*)apiClient->dataReceived);
-
-    {{/returnSimpleType}}
-    {{^returnSimpleType}}
-    //primitive reutrn type not simple
-    cJSON *{{paramName}}localVarJSON = cJSON_Parse(apiClient->dataReceived);
-    cJSON *{{{paramName}}}VarJSON;
-    list_t *elementToReturn = list_create();
-    cJSON_ArrayForEach({{{paramName}}}VarJSON, {{paramName}}localVarJSON){
-        keyValuePair_t *keyPair = keyValuePair_create(strdup({{{paramName}}}VarJSON->string), cJSON_Print({{{paramName}}}VarJSON));
-        list_addElement(elementToReturn, keyPair);
-    }
-    cJSON_Delete({{paramName}}localVarJSON);
-
-    {{/returnSimpleType}}
-    {{/returnTypeIsPrimitive}}
-    {{^returnTypeIsPrimitive}}
-    {{#returnContainer}}
-    cJSON *{{classname}}localVarJSON = cJSON_Parse(apiClient->dataReceived);
-    if(!cJSON_IsArray({{classname}}localVarJSON)) {
-        return 0;//nonprimitive container
-    }
-    list_t *elementToReturn = list_create();
-    cJSON *{{{paramName}}}VarJSON;
-    cJSON_ArrayForEach({{{paramName}}}VarJSON, {{classname}}localVarJSON)
-    {
-        if(!cJSON_IsObject({{{paramName}}}VarJSON))
-        {
-           // return 0;
-        }
-        char *localVarJSONToChar = cJSON_Print({{{paramName}}}VarJSON);
-        list_addElement(elementToReturn , localVarJSONToChar);
-    }
-
-    cJSON_Delete( {{classname}}localVarJSON);
-    cJSON_Delete( {{{paramName}}}VarJSON);
-    {{/returnContainer}}
-    {{^returnContainer}}
-    //nonprimitive not container
-    cJSON *{{classname}}localVarJSON = cJSON_Parse(apiClient->dataReceived);
-    {{{returnBaseType}}}_t *elementToReturn = {{{returnBaseType}}}_parseFromJSON({{classname}}localVarJSON);
-    cJSON_Delete({{classname}}localVarJSON);
-    if(elementToReturn == NULL) {
-        // return 0;
-    }
-
-    {{/returnContainer}}
-    //return type
-    {{/returnTypeIsPrimitive}}
-    if (apiClient->dataReceived) {
-        free(apiClient->dataReceived);
-    }
-    {{#hasQueryParams}}list_free(localVarQueryParameters);{{/hasQueryParams}}
-    {{#hasHeaderParams}}list_free(localVarHeaderParameters);{{/hasHeaderParams}}
-    {{#hasFormParams}}list_free(localVarFormParameters);{{/hasFormParams}}
-    {{#hasProduces}}list_free(localVarHeaderType);{{/hasProduces}}
-    {{#hasConsumes}}list_free(localVarContentType);{{/hasConsumes}}
-    free(localVarPath);
-    {{#pathParams}}
-    free(localVarToReplace_{{paramName}});
-    {{/pathParams}}
-    {{#headerParams}}
-    {{#isString}}
-    free(keyHeader_{{{paramName}}});
-    free(valueHeader_{{{paramName}}});
-    {{/isString}}
-    {{^isString}}
-    free(keyHeader_{{{paramName}}});
-    {{/isString}}
-    free(keyPairHeader_{{paramName}});
-    {{/headerParams}}
-    {{#bodyParams}}
-    {{#isListContainer}}
-    cJSON_Delete(localVarItemJSON_{{paramName}});
-    cJSON_Delete(localVarSingleItemJSON_{{paramName}});
-    cJSON_Delete(localVar_{{paramName}});
-    free(localVarBodyParameters);
-    {{/isListContainer}}
-    {{^isListContainer}}
-    cJSON_Delete(localVarSingleItemJSON_{{paramName}});
-    free(localVarBodyParameters);
-    {{/isListContainer}}
-    {{/bodyParams}}
-    {{#queryParams}}
-    {{^isListContainer}}
-    {{#isString}}
-    if(keyQuery_{{{paramName}}}){
-        free(keyQuery_{{{paramName}}});
-        keyQuery_{{{paramName}}} = NULL;
-    }
-    if(valueQuery_{{{paramName}}}){
-        free(valueQuery_{{{paramName}}});
-        valueQuery_{{{paramName}}} = NULL;
-    }
-    if(keyPairQuery_{{{paramName}}}){
-        keyValuePair_free(keyPairQuery_{{{paramName}}});
-        keyPairQuery_{{{paramName}}} = NULL;
-    }
-    {{/isString}}
-    {{^isString}}
-    if(keyQuery_{{{paramName}}}){
-        free(keyQuery_{{{paramName}}});
-        keyQuery_{{{paramName}}} = NULL;
-    }
-    if(keyPairQuery_{{{paramName}}}){
-        keyValuePair_free(keyPairQuery_{{{paramName}}});
-        keyPairQuery_{{{paramName}}} = NULL;
-    }
-    {{/isString}}
-    {{/isListContainer}}
-    {{/queryParams}}
-    {{#formParams}}
-    {{#isFile}}
-    free(keyForm_{{{paramName}}});
-//    free(fileVar_{{paramName}}->data);
-//    free(fileVar_{{paramName}});
-    free(keyPairForm_{{paramName}});
-    {{/isFile}}
-    {{^isFile}}
-    {{#isString}}
-    free(keyForm_{{{paramName}}});
-    free(valueForm_{{{paramName}}});
-    free(keyPairForm_{{paramName}});
-    {{/isString}}
-    {{^isString}}
-    free(keyForm_{{{paramName}}});
-    free(keyPairForm_{{paramName}});
-    {{/isString}}
-    {{/isFile}}
-    {{/formParams}}
-    return elementToReturn;
-end:
-    return NULL;
-    {{/returnType}}
-    {{^returnType}}
-    //No return type
-end:
-    if (apiClient->dataReceived) {
-        free(apiClient->dataReceived);
-    }
-    {{#hasQueryParams}}list_free(localVarQueryParameters);{{/hasQueryParams}}
-    {{#hasHeaderParams}}list_free(localVarHeaderParameters);{{/hasHeaderParams}}
-    {{#hasFormParams}}list_free(localVarFormParameters);{{/hasFormParams}}
-    {{#hasProduces}}list_free(localVarHeaderType);{{/hasProduces}}
-    {{#hasConsumes}}list_free(localVarContentType);{{/hasConsumes}}
-    free(localVarPath);
-    {{#pathParams}}
-    free(localVarToReplace_{{paramName}});
-    {{/pathParams}}
-    {{#headerParams}}
-    {{#isString}}
-    free(keyHeader_{{{paramName}}});
-    free(valueHeader_{{{paramName}}});
-    {{/isString}}
-    {{^isString}}
-    free(keyHeader_{{{paramName}}});
-    {{/isString}}
-    free(keyPairHeader_{{paramName}});
-    {{/headerParams}}
-    {{#bodyParams}}
-    {{#isListContainer}}
-    cJSON_Delete(localVarItemJSON_{{paramName}});
-    cJSON_Delete(localVarSingleItemJSON_{{paramName}});
-    cJSON_Delete(localVar_{{paramName}});
-    free(localVarBodyParameters);
-    {{/isListContainer}}
-    {{^isListContainer}}
-    cJSON_Delete(localVarSingleItemJSON_{{paramName}});
-    free(localVarBodyParameters);
-    {{/isListContainer}}
-    {{/bodyParams}}
-    {{#queryParams}}
-    {{^isListContainer}}
-    {{#isString}}
-    if(keyQuery_{{{paramName}}}){
-        free(keyQuery_{{{paramName}}});
-        keyQuery_{{{paramName}}} = NULL;
-    }
-    if(valueQuery_{{{paramName}}}){
-        free(valueQuery_{{{paramName}}});
-        valueQuery_{{{paramName}}} = NULL;
-    }
-    if(keyPairQuery_{{{paramName}}}){
-        keyValuePair_free(keyPairQuery_{{{paramName}}});
-        keyPairQuery_{{{paramName}}} = NULL;
-    }
-    {{/isString}}
-    {{#isString}}
-    if(keyQuery_{{{paramName}}}){
-        free(keyQuery_{{{paramName}}});
-        keyQuery_{{{paramName}}} = NULL;
-    }
-    if(keyPairQuery_{{{paramName}}}){
-        keyValuePair_free(keyPairQuery_{{{paramName}}});
-        keyPairQuery_{{{paramName}}} = NULL;
-    }
-    {{/isString}}
-    {{/isListContainer}}
-    {{/queryParams}}
-    {{#formParams}}
-    {{#isFile}}
-    free(keyForm_{{{paramName}}});
-//    free(fileVar_{{paramName}}->data);
-//    free(fileVar_{{paramName}});
-    {{/isFile}}
-    {{^isFile}}
-    {{#isString}}
-    free(keyForm_{{{paramName}}});
-    free(valueForm_{{{paramName}}});
-    keyValuePair_free(keyPairForm_{{{paramName}}});
-    {{/isString}}
-    {{^isString}}
-    free(keyForm_{{{paramName}}});
-    free(keyPairForm_{{paramName}});
-    {{/isString}}
-    {{/isFile}}
-    {{/formParams}}
-    {{/returnType}}
-
+enum {
+CURL_GLOBAL_SSL = (1<<0), /* no purpose since since 7.57.0 */
+CURL_GLOBAL_WIN32 = (1<<1),
+CURL_GLOBAL_ALL = (CURL_GLOBAL_SSL|CURL_GLOBAL_WIN32),
+CURL_GLOBAL_NOTHING = 0,
+CURL_GLOBAL_DEFAULT = CURL_GLOBAL_ALL,
+CURL_GLOBAL_ACK_EINTR = (1<<2),
 }
 
-{{/operation}}
-{{/operations}}
+struct apiClient_t {
+    char* basePath;
+    char* caPath;
+    void* dataReceived;
+    long response_code;
+    char*[string] apiKeys;
+    char* accessToken;
+}
+
+struct binary_t
+{
+    uint8_t* data;
+    uint len;
+}
+
+size_t writeDataCallback(void* buffer, size_t size, size_t nmemb, void* userp);
+
+apiClient_t* apiClient_create() {
+    curl_global_init(CURL_GLOBAL_ALL);
+    apiClient_t* apiClient = cast(apiClient_t*) malloc(apiClient_t.sizeof);
+    apiClient.basePath = strdup("{{{basePath}}}");
+    apiClient.caPath = null;
+    apiClient.dataReceived = null;
+    apiClient.response_code = 0;
+    {{#hasAuthMethods}}
+    {{#authMethods}}
+    {{#isBasic}}
+    apiClient.username = null;
+    apiClient.password = null;
+    {{/isBasic}}
+    {{#isOAuth}}
+    apiClient.accessToken = null;
+    {{/isOAuth}}
+    {{#isApiKey}}
+    apiClient.apiKeys = null;
+    {{/isApiKey}}
+    {{/authMethods}}
+    {{/hasAuthMethods}}
+
+    return apiClient;
+}
+
+apiClient_t* apiClient_create_with_base_path(const char* basePath
+, const char* caPath
+{{#hasAuthMethods}}
+{{#authMethods}}
+{{#isApiKey}}
+, char*[string] apiKeys
+{{/isApiKey}}
+{{/authMethods}}
+{{/hasAuthMethods}}
+) {
+    curl_global_init(CURL_GLOBAL_ALL);
+    apiClient_t* apiClient = cast(apiClient_t*) malloc(apiClient_t.sizeof);
+    if(basePath){
+        apiClient.basePath = strdup(basePath);
+    }else{
+        apiClient.basePath = strdup("{{{basePath}}}");
+    }
+
+    if(caPath){
+        apiClient.caPath = strdup(caPath);
+    }else{
+        apiClient.caPath = null;
+    }
+
+    apiClient.dataReceived = null;
+    apiClient.response_code = 0;
+    {{#hasAuthMethods}}
+    {{#authMethods}}
+    {{#isBasic}}
+    apiClient.username = null;
+    apiClient.password = null;
+    {{/isBasic}}
+    {{#isOAuth}}
+    apiClient.accessToken = null;
+    {{/isOAuth}}
+    {{#isApiKey}}
+    if(apiKeys!= null) {
+        apiClient.apiKeys apiKeys;
+    }else{
+        apiClient.apiKeys = null;
+    }
+    {{/isApiKey}}
+    {{/authMethods}}
+    {{/hasAuthMethods}}
+
+    return apiClient;
+}
+
+void apiClient_free(apiClient_t* apiClient) {
+    if(apiClient.basePath) {
+        free(apiClient.basePath);
+    }
+    if(apiClient.caPath) {
+        free(apiClient.caPath);
+    }
+    {{#hasAuthMethods}}
+    {{#authMethods}}
+    {{#isBasic}}
+    if(apiClient.username) {
+        free(apiClient.username);
+    }
+    if(apiClient.password) {
+        free(apiClient.password);
+    }
+    {{/isBasic}}
+    {{#isOAuth}}
+    if(apiClient.accessToken) {
+        free(apiClient.accessToken);
+    }
+    {{/isOAuth}}
+    {{/authMethods}}
+    {{/hasAuthMethods}}
+    free(apiClient);
+    curl_global_cleanup();
+}
+
+string replaceSpaceWithPlus(string stringToProcess) {
+    import std.string;
+    return stringToProcess.replace(' ', '+');
+}
+
+void replaceSpaceWithPlus(char* stringToProcess) {
+    for(int i = 0; i < strlen(stringToProcess); i++) {
+        if(stringToProcess[i] == ' ') {
+            stringToProcess[i] = '+';
+        }
+    }
+}
+
+char* assembleTargetUrl(char*    basePath,
+                        char*    operationParameter,
+                        char*[string]    queryParameters) {
+    int neededBufferSizeForQueryParameters = 0;
+
+    if(queryParameters != null) {
+        foreach(key, value; queryParameters) {
+            neededBufferSizeForQueryParameters +=
+                key.length + strlen(value);
+        }
+
+        neededBufferSizeForQueryParameters +=
+            (queryParameters.length * 2); // each keyValuePair is separated by a = and a & except the last, but this makes up for the ? at the beginning
+    }
+
+    ulong operationParameterLength = 0;
+    ulong basePathLength = strlen(basePath);
+    bool slashNeedsToBeAppendedToBasePath = false;
+
+    if(operationParameter != null) {
+        operationParameterLength = (1 + strlen(operationParameter));
+    }
+    if(basePath[strlen(basePath) - 1] != '/') {
+        slashNeedsToBeAppendedToBasePath = true;
+        basePathLength++;
+    }
+
+    char* targetUrl = cast(char*)
+        malloc(
+            neededBufferSizeForQueryParameters + basePathLength + operationParameterLength +
+            1);
+
+    strcpy(targetUrl, basePath);
+
+    if(operationParameter != null) {
+        strcat(targetUrl, operationParameter);
+    }
+
+    if(queryParameters != null) {
+        strcat(targetUrl, "?");
+	long countParam = 0;
+        foreach(key, value; queryParameters) {
+            strcat(targetUrl, replaceSpaceWithPlus(key).toStringz);
+            strcat(targetUrl, "=");
+            replaceSpaceWithPlus(value);
+            strcat(targetUrl, value);
+	    if(++countParam != queryParameters.length)
+	       strcat(targetUrl, "&");
+        }
+    }
+
+    return targetUrl;
+}
+
+char* assembleHeaderField(string key, char* value) {
+    char* header = cast(char*) malloc(key.length + strlen(value) + 3);
+
+    strcpy(header, key.toStringz),
+    strcat(header, ": ");
+    strcat(header, value);
+
+    return header;
+}
+
+void postData(CURL* handle, char* bodyParameters) {
+    curl_easy_setopt(handle, CURLOPT_POSTFIELDS, bodyParameters);
+    curl_easy_setopt(handle, CURLOPT_POSTFIELDSIZE_LARGE,
+                     strlen(bodyParameters));
+}
+
+void apiClient_invoke(apiClient_t*    apiClient,
+                      char*        operationParameter,
+                      char*[string]queryParameters,
+                      char*[string]headerParameters,
+                      char*[string]formParameters,
+                      char*[string]headerType,
+                      char*[string]contentType,
+                      char*        bodyParameters,
+                      char*        requestType) {
+    CURL* handle = curl_easy_init();
+    CURLcode res;
+
+    if(handle) {
+        curl_mime* mime = null;
+        curl_slist* headers = null;
+        char* buffContent = null;
+        char* buffHeader = null;
+        binary_t* fileVar = null;
+        char* formString = null;
+
+        if(headerType != null) {
+            foreach(listEntry; headerType) {
+                if(strstr(listEntry,
+                          "xml") == null)
+                {
+                    buffHeader = cast(char*) malloc(strlen(
+                                    "Accept: ") +
+                                        strlen(listEntry) + 1);
+                    sprintf(buffHeader, "%s%s".toStringz, "Accept: ".toStringz,
+                            listEntry);
+                    headers = curl_slist_append(headers,
+                                                buffHeader);
+                    free(buffHeader);
+                }
+            }
+        }
+        if(contentType != null) {
+            foreach(listEntry; contentType) {
+                if(strstr(listEntry,
+                          "xml") == null)
+                {
+                    buffContent =
+                        cast(char*) malloc(strlen(
+                                   "Content-Type: ") + strlen(
+                                   listEntry) +
+                               1);
+                    sprintf(buffContent, "%s%s".toStringz,
+                            "Content-Type: ".toStringz,
+                            listEntry);
+                    headers = curl_slist_append(headers,
+                                                buffContent);
+                }
+            }
+        } else {
+            headers = curl_slist_append(headers,
+                                        "Content-Type: application/json");
+        }
+
+        if(requestType != null) {
+            curl_easy_setopt(handle, CURLOPT_CUSTOMREQUEST,
+                             requestType);
+        }
+
+        if(formParameters != null) {
+            if(strstr(buffContent,
+                      "application/x-www-form-urlencoded") != null)
+            {
+                long parameterLength = 0;
+                long keyPairLength = 0;
+		long stopParameter = 0;
+                foreach(key, value; formParameters) {
+                    keyPairLength = key.length + strlen(value) + 1;
+
+		    stopParameter++;
+
+                    parameterLength = parameterLength +
+                                      keyPairLength;
+                }
+		parameterLength += formParameters.length;
+
+                formString = cast(char*) malloc(parameterLength + 1);
+                memset(formString, 0, parameterLength + 1);
+
+                foreach(key, value; formParameters) {
+                    if(value != null)
+                    {
+                        strcat(formString, key.toStringz);
+                        strcat(formString, "=");
+                        strcat(formString, value);
+			if(--stopParameter != 0)
+			   strcat(formString, "&");
+                    }
+                }
+                curl_easy_setopt(handle, CURLOPT_POSTFIELDS,
+                                 formString);
+            }
+            if(strstr(buffContent, "multipart/form-data") != null) {
+                mime = curl_mime_init(handle);
+                foreach(key, value; formParameters) {
+                    if(value != null)
+                    {
+                        curl_mimepart* part =
+                            curl_mime_addpart(mime);
+
+                        curl_mime_name(part, key.toStringz);
+
+
+                        if(strcmp(key.toStringz,
+                                  "file") == 0)
+                        {
+                            memcpy(&fileVar,
+                                   value,
+                                   fileVar.sizeof);
+                            curl_mime_data(part,
+                                           fileVar.data,
+                                           fileVar.len);
+                            curl_mime_filename(part,
+                                               "image.png");
+                        } else {
+                            curl_mime_data(part,
+                                           value,
+                                           CURL_ZERO_TERMINATED);
+                        }
+                    }
+                }
+                curl_easy_setopt(handle, CURLOPT_MIMEPOST,
+                                 mime);
+            }
+        }
+
+        foreach(key, value; headerParameters) {
+            if(value != null)
+            {
+                char* headerValueToWrite = assembleHeaderField(
+                    key, value);
+                curl_slist_append(headers, headerValueToWrite);
+                free(headerValueToWrite);
+            }
+        }
+
+        if( strstr(apiClient.basePath, "https") != null ){
+            if (apiClient.caPath) {
+                curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, true);
+                curl_easy_setopt(handle, CURLOPT_CAINFO, apiClient.caPath);
+            } else {
+                curl_easy_setopt(handle, CURLOPT_SSL_VERIFYPEER, false);
+                curl_easy_setopt(handle, CURLOPT_SSL_VERIFYHOST, false);
+            }
+        }
+
+        {{#hasAuthMethods}}
+        {{#authMethods}}
+        {{#isApiKey}}
+        // this would only be generated for apiKey authentication
+        if (apiClient.apiKeys != null)
+        {
+        foreach(key, value; apiClient.apiKeys) {
+        if(value != null)
+        {
+            char* headerValueToWrite = assembleHeaderField(
+                key, value);
+            curl_slist_append(headers, headerValueToWrite);
+            free(headerValueToWrite);
+        }
+        }
+        }
+        {{/isApiKey}}
+        {{/authMethods}}
+        {{/hasAuthMethods}}
+
+        char* targetUrl =
+            assembleTargetUrl(apiClient.basePath,
+                              operationParameter,
+                              queryParameters);
+
+        curl_easy_setopt(handle, CURLOPT_URL, targetUrl);
+        curl_easy_setopt(handle,
+                         CURLOPT_WRITEFUNCTION,
+                         writeDataCallback);
+        curl_easy_setopt(handle,
+                         CURLOPT_WRITEDATA,
+                         &apiClient.dataReceived);
+        curl_easy_setopt(handle, CURLOPT_HTTPHEADER, headers);
+        curl_easy_setopt(handle, CURLOPT_VERBOSE, 0); // to get curl debug msg 0: to disable, 1L:to enable
+
+        {{#hasAuthMethods}}
+        {{#authMethods}}
+        {{#isBasic}}
+        // this would only be generated for basic authentication:
+        char* authenticationToken;
+
+        if((apiClient.username != null) &&
+           (apiClient.password != null) )
+        {
+            authenticationToken = cast(char*) malloc(strlen(
+                                 apiClient.username) +
+                                         strlen(
+                                 apiClient.password) +
+                                         2);
+            sprintf(authenticationToken,
+                    "%s:%s".toStringz,
+                    apiClient.username,
+                    apiClient.password);
+
+            curl_easy_setopt(handle,
+                             CURLOPT_HTTPAUTH,
+                             CURLAUTH_BASIC);
+            curl_easy_setopt(handle,
+                             CURLOPT_USERPWD,
+                             authenticationToken);
+        }
+        {{/isBasic}}
+        {{#isOAuth}}
+        // this would only be generated for OAuth2 authentication
+        if(apiClient.accessToken != null) {
+            // curl_easy_setopt(handle, CURLOPT_HTTPAUTH, CURLAUTH_BEARER);
+            curl_easy_setopt(handle,
+                             CURLOPT_XOAUTH2_BEARER,
+                             apiClient.accessToken);
+        }
+        {{/isOAuth}}
+        {{/authMethods}}
+        {{/hasAuthMethods}}
+
+        if(bodyParameters != null) {
+            postData(handle, bodyParameters);
+        }
+
+        res = curl_easy_perform(handle);
+
+        curl_slist_free_all(headers);
+
+        free(targetUrl);
+
+        if(contentType != null) {
+            free(buffContent);
+        }
+
+        if(res == CURLE_OK) {
+            curl_easy_getinfo(handle, CURLINFO_RESPONSE_CODE, &apiClient.response_code);
+        } else {
+            char* url,ip,scheme;
+            long port;
+            curl_easy_getinfo(handle, CURLINFO_EFFECTIVE_URL, &url);
+            curl_easy_getinfo(handle, CURLINFO_PRIMARY_IP, &ip);
+            curl_easy_getinfo(handle, CURLINFO_PRIMARY_PORT, &port);
+            curl_easy_getinfo(handle, CURLINFO_SCHEME, &scheme);
+            fprintf(stderr, "curl_easy_perform() failed\n\nURL: %s\nIP: %s\nPORT: %li\nSCHEME: %s\nStrERROR: %s\n",url,ip,port,scheme,
+            curl_easy_strerror(res));
+        }
+        {{#hasAuthMethods}}
+        {{#authMethods}}
+        {{#isBasic}}
+        if((apiClient.username != null) &&
+        (apiClient.password != null) )
+        {
+        free(authenticationToken);
+        }
+        {{/isBasic}}
+        {{/authMethods}}
+        {{/hasAuthMethods}}
+
+        curl_easy_cleanup(handle);
+        if(formParameters != null) {
+            free(formString);
+            curl_mime_free(mime);
+        }
+    }
+}
+
+size_t writeDataCallback(void* buffer, size_t size, size_t nmemb, void* userp) {
+    *userp = strdup(buffer);
+
+    return size * nmemb;
+}
+
+char* strReplace(char* orig, char* rep, char* _with) {
+    char* result; // the return string
+    char* ins; // the next insert point
+    char* tmp; // varies
+    int lenRep; // length of rep (the string to remove)
+    int lenWith; // length of with (the string to replace rep with)
+    int lenFront; // distance between rep and end of last rep
+    int count; // number of replacements
+
+    // sanity checks and initialization
+    if(!orig || !rep)
+    {
+        return null;
+    }
+    lenRep = strlen(rep);
+    if(lenRep == 0) {
+        return null; // empty rep causes infinite loop during count
+    }
+    if(!_with) {
+        _with = "";
+    }
+    lenWith = strlen(_with);
+
+    // count the number of replacements needed
+    ins = orig;
+    for(count = 0; tmp = strstr(ins, rep); ++count) {
+        ins = tmp + lenRep;
+    }
+
+    tmp = result = cast(char*) malloc(strlen(orig) + (lenWith - lenRep) * count + 1);
+
+    if(!result) {
+        return null;
+    }
+    char* originalPointer = orig; // copying original pointer to free the memory
+    // first time through the loop, all the variable are set correctly
+    // from here on,
+    // tmp points to the end of the result string
+    // ins points to the next occurrence of rep in orig
+    // orig points to the remainder of orig after "end of rep"
+    while(count--) {
+        ins = strstr(orig, rep);
+        lenFront = ins - orig;
+        tmp = strncpy(tmp, orig, lenFront) + lenFront;
+        tmp = strcpy(tmp, _with) + lenWith;
+        orig += lenFront + lenRep; // move to next "end of rep"
+    }
+    strcpy(tmp, orig);
+    free(originalPointer);
+    return result;
+}
+
