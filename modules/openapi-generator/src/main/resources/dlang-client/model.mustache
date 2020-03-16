@@ -5,15 +5,16 @@
 import {{{.}}};
 {{/imports}}{{#isEnum}}
 enum {{classname}} { {{#allowableValues}}
-{{#enumVars}} {{{value}}},{{/enumVars}}
-} {{/allowableValues}}
+{{#enumVars}} {{{value}}},
+{{/enumVars}} {{/allowableValues}} }
 {{/isEnum}}{{^isEnum}}
 {{#vars}}
 {{^isContainer}}
     {{^isModel}}
     {{#isEnum}}
 enum {{classname}} { {{#allowableValues}}
-} {{/allowableValues}}
+{{#enumVars}} {{{value}}},
+{{/enumVars}} {{/allowableValues}} }
     {{/isEnum}}
     {{/isModel}}
     {{/isContainer}}
@@ -22,8 +23,8 @@ enum {{classname}} { {{#allowableValues}}
         {{^isModel}}
         {{#isEnum}}
 enum {{classname}} { {{#allowableValues}}
-{{#enumVars}} {{{value}}},{{/enumVars}}
-} {{/allowableValues}}
+{{#enumVars}} {{{value}}},
+{{/enumVars}} {{/allowableValues}} }
         {{/isEnum}}
         {{/isModel}}
         {{/items}}
